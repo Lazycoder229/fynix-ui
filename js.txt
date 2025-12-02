@@ -1,0 +1,659 @@
+import { removeErrorOverlay, showErrorOverlay } from "./error/errorOverlay";
+export const TEXT = Symbol("text");
+export const Fragment = Symbol("Fragment");
+
+/* ----------------------
+    Virtual Node Creation (Rest/h)
+---------------------- */
+export function createTextVNode(text) {
+  // ✅ Handle null/undefined/false
+  if (text == null || text === false) {
+    return { type: TEXT, props: { nodeValue: "" }, key: null };
+  } // ✅ If this is a reactive state object - rely on component re-render
+
+  if (text && typeof text === "object" && text._isRestState === true) {
+    // ✅ CRITICAL: Access .value now to get the current string value for the initial render VNode.
+    // This access *should* already have been done in h() to track the dependency.
+    const initialValue = text.value;
+
+    const vnode = {
+      type: TEXT,
+      props: { nodeValue: String(initialValue) },
+      key: null, // Optional: store the state object for potential future fine-grained use
+      _state: text,
+    };
+
+    return vnode;
+  }
+
+  return { type: TEXT, props: { nodeValue: String(text) }, key: null };
+}
+
+export function Layout({ children }) {
+  return h("div", { class: "layout" }, ...children);
+}
+
+// Renamed from Rest to h for standard VDOM library convention
+export function h(type, props = {}, ...children) {
+  // ✅ FIX: Ensure props is always an object, even if explicitly passed as null or undefined.
+  if (props === null || typeof props !== "object" || Array.isArray(props)) {
+    props = {};
+  }
+
+  const flatChildren = []; // Iterate through flattened children array
+
+  for (const c of children.flat(Infinity)) {
+    // 1. Filter out null/false/undefined values
+    if (c == null || c === false) continue; // ✅ Handle reactive state objects - CALL GETTER HERE WHILE IN COMPONENT CONTEXT!
+
+    if (c && typeof c === "object" && c._isRestState === true) {
+      // ✅ Access .value NOW while activeContext is still set
+      const currentValue = c.value; // This triggers the getter and tracks dependency! // Create text vnode with the reactive object
+
+      const textVNode = createTextVNode(c);
+      flatChildren.push(textVNode);
+    } // ✅ Handle strings and numbers
+    else if (typeof c === "string" || typeof c === "number") {
+      flatChildren.push(createTextVNode(c));
+    } // ✅ Handle Fragments
+    else if (c?.type === Fragment) {
+      const filteredFragmentChildren = (c.props.children || []).filter(
+        (child) => child != null && child !== false
+      );
+      flatChildren.push(...filteredFragmentChildren);
+    } // ✅ Handle regular vnodes (must have a 'type' property)
+    else if (c?.type) {
+      flatChildren.push(c);
+    } // ✅ Fallback: convert unknown objects to string
+    else if (typeof c === "object") {
+      console.warn("[RestJS] Unknown object passed as child:", c);
+      flatChildren.push(createTextVNode(String(c)));
+    }
+  } // This is the line that caused the error previously if props was null
+
+  const key = props.key ?? null;
+  if (key) delete props.key;
+
+  if (type === Fragment)
+    return { type: Fragment, props: { children: flatChildren }, key };
+
+  return { type, props: { ...props, children: flatChildren }, key };
+}
+// ... after the new Rest function
+h.Fragment = ({ children }) => children;
+// Alias for user-friendliness
+export const Rest = h;
+Rest.Fragment = h.Fragment;
+
+/* ----------------------
+    Component & Hooks
+---------------------- */
+const componentInstances = new WeakMap();
+let activeContext = null;
+let rootRenderFn = null;
+
+function beginComponent(vnode) {
+  let ctx = componentInstances.get(vnode);
+  if (!ctx) {
+    ctx = {
+      hooks: [],
+      hookIndex: 0,
+      effects: [],
+      cleanups: [],
+      _vnode: vnode,
+      _accessedStates: new Set(),
+      _subscriptions: new Set(),
+      _subscriptionCleanups: [], // 🎯 CRITICAL FIX: Array to hold all unsub functions
+    };
+    componentInstances.set(vnode, ctx);
+  }
+  ctx.hookIndex = 0;
+  ctx._accessedStates.clear(); // 🎯 CRITICAL FIX: Clean up ALL previous subscriptions before re-recording dependencies
+  if (ctx._subscriptionCleanups) {
+    ctx._subscriptionCleanups.forEach((unsub) => unsub());
+  }
+  ctx._subscriptions.clear(); // Reset the set of subscribed states
+  ctx._subscriptionCleanups = []; // Clear the unsub functions
+  activeContext = ctx;
+  return ctx;
+}
+
+function endComponent() {
+  if (!activeContext) return;
+
+  const componentCtx = activeContext; // Subscribe to accessed states
+
+  componentCtx._accessedStates.forEach((state) => {
+    // Only subscribe if this state hasn't been added to the dependency list yet
+    if (!componentCtx._subscriptions.has(state)) {
+      // The single function that triggers the global re-render
+      const globalRerenderer = () => {
+        // Check if the component is still mounted and the root is available
+        if (componentCtx._vnode && rootRenderFn) {
+          rootRenderFn(); // trigger global re-render
+        }
+      }; // Subscribe to the state and get the unsubscribe function
+
+      const unsub = state.subscribe(() => {
+        // Ensure only one re-render is queued per state change
+        queueMicrotask(globalRerenderer);
+      }); // Store the state object to mark it as subscribed
+
+      componentCtx._subscriptions.add(state); // 🎯 CRITICAL FIX: Store the unsubscribe function for cleanup
+      componentCtx._subscriptionCleanups.push(unsub);
+    }
+  });
+
+  activeContext = null;
+}
+
+export function renderComponent(Component, props = {}) {
+  // Create a dummy VNode for the component itself to use as a key in componentInstances
+  const vnodeKey = { type: Component, props };
+  const ctx = beginComponent(vnodeKey);
+  try {
+    removeErrorOverlay();
+    const result = Component(props); // Overwrite the VNode key with the actual rendered VNode for the parent's tree
+    ctx._vnode = result;
+    return result;
+  } catch (err) {
+    console.error(`[RestJS] Component render error:`, err);
+    showErrorOverlay(err);
+    return h("div", { style: "color:red" }, `Error: ${err.message}`);
+  } finally {
+    endComponent();
+  }
+}
+
+/* ----------------------
+    Reactive State
+---------------------- */
+export function restState(initial) {
+  const ctx = activeContext;
+  if (!ctx) throw new Error("restState() called outside component");
+
+  const idx = ctx.hookIndex++;
+  if (!ctx.hooks[idx]) {
+    let value = initial;
+    const subscribers = new Set();
+
+    const s = {
+      get value() {
+        if (activeContext) activeContext._accessedStates.add(s);
+        return value;
+      },
+      set value(newVal) {
+        if (newVal === value) return;
+        value = newVal;
+        subscribers.forEach((fn) => fn());
+      },
+      subscribe(fn) {
+        subscribers.add(fn);
+        return () => subscribers.delete(fn);
+      },
+      _isRestState: true,
+    };
+
+    ctx.hooks[idx] = s;
+  }
+
+  return ctx.hooks[idx];
+}
+
+/* ----------------------
+    Refs & Effects
+---------------------- */
+export function restRef(initial = null) {
+  const ctx = activeContext;
+  if (!ctx) throw new Error("restRef() called outside component");
+  const idx = ctx.hookIndex++;
+  if (!ctx.hooks[idx]) ctx.hooks[idx] = { current: initial };
+  return ctx.hooks[idx];
+}
+
+export function restEffect(effect, deps) {
+  const ctx = activeContext;
+  if (!ctx) throw new Error("restEffect() called outside component");
+  const idx = ctx.hookIndex++;
+  const prev = ctx.hooks[idx];
+  const changed = !prev || !deps || deps.some((d, i) => d !== prev.deps?.[i]);
+  if (changed) {
+    prev?.cleanup?.();
+    ctx._activeEffect = effect;
+    const cleanup = effect() || null;
+    ctx._activeEffect = null;
+    ctx.hooks[idx] = { deps, cleanup };
+    if (cleanup) ctx.cleanups.push(cleanup);
+  }
+}
+
+/* ----------------------
+    Event Delegation
+---------------------- */
+const delegatedEvents = new Map();
+let eventIdCounter = 1;
+function ensureDelegated(eventType) {
+  if (delegatedEvents.has(eventType)) return;
+  delegatedEvents.set(eventType, new Map());
+  document.addEventListener(eventType, (e) => {
+    let cur = e.target;
+    while (cur && cur !== document) {
+      if (cur.nodeType !== 1) break;
+      const eid = cur._rest_eid;
+      const map = delegatedEvents.get(eventType);
+      if (eid != null && map?.has(eid)) {
+        map.get(eid)(e);
+        return;
+      }
+      cur = cur.parentElement;
+    }
+  });
+}
+
+function registerDelegatedHandler(el, eventName, fn) {
+  if (!fn) return;
+  if (el.nodeType !== 1) return;
+
+  const eid = el._rest_eid ?? (el._rest_eid = ++eventIdCounter);
+  ensureDelegated(eventName);
+
+  delegatedEvents.get(eventName).set(eid, (e) => {
+    try {
+      // ✅ Call with proper this binding to the element
+      fn.call(el, e);
+    } catch (err) {
+      console.error("[RestJS] Event handler error:", err);
+      showErrorOverlay(err);
+    }
+  });
+}
+
+/* ----------------------
+    DOM Creation & Hydration
+---------------------- */
+async function createDom(vnode, existing = null) {
+  if (vnode == null || vnode === false) {
+    return document.createTextNode("");
+  }
+
+  // ✅ 1. Handle plain strings or numbers
+  if (typeof vnode === "string" || typeof vnode === "number") {
+    return document.createTextNode(String(vnode));
+  }
+
+  // ✅ 2. Handle explicit TEXT vnode
+  if (vnode.type === TEXT) {
+    const textNode =
+      existing || document.createTextNode(vnode.props.nodeValue ?? "");
+    vnode._domNode = textNode;
+    return textNode;
+  }
+
+  // ✅ 3. Handle async vnode (Promise)
+  if (vnode instanceof Promise) {
+    const placeholder = document.createTextNode("Loading...");
+    vnode
+      .then(async (resolved) => {
+        const dom = await createDom(resolved);
+        placeholder.replaceWith(dom);
+      })
+      .catch((err) => {
+        console.error("[RestJS Suspense] async render failed:", err);
+        placeholder.textContent = "⚠️ Error loading async component";
+      });
+    return placeholder;
+  }
+
+  // ✅ 4. Handle Fragment
+  if (vnode.type === Fragment) {
+    const frag = document.createDocumentFragment();
+    for (const child of vnode.props?.children || []) {
+      frag.appendChild(await createDom(child));
+    }
+    vnode._domNode = frag;
+    return frag;
+  }
+
+  // ✅ 5. Handle function components
+  if (typeof vnode.type === "function") {
+    const rendered = await renderMaybeAsyncComponent(
+      vnode.type,
+      vnode.props,
+      vnode
+    );
+    vnode._rendered = rendered;
+    const dom = await createDom(rendered);
+    vnode._domNode = dom;
+    return dom;
+  }
+
+  // ✅ 6. Handle standard DOM elements (this is where `el` belongs)
+  const el = existing || document.createElement(vnode.type);
+
+  // Apply props
+  for (const [k, v] of Object.entries(vnode.props || {})) {
+    if (k === "children") continue;
+
+    if (k.startsWith("r-") && typeof v === "function") {
+      // Reactive event (ex: r-click)
+      registerDelegatedHandler(el, k.slice(2).toLowerCase(), v);
+    } else if (k === "className" || k === "class") {
+      el.setAttribute("class", v);
+    } else if (k === "style" && typeof v === "object") {
+      Object.assign(el.style, v);
+    } else if (v != null && v !== false) {
+      el.setAttribute(k, v);
+    }
+  }
+
+  // ✅ 7. Render children safely
+  const children = vnode.props?.children || [];
+  for (const child of children) {
+    el.appendChild(await createDom(child));
+  }
+
+  vnode._domNode = el;
+  return el;
+}
+
+/* ----------------------
+    Component Async Render Helper
+---------------------- */
+async function renderMaybeAsyncComponent(Component, props, vnode) {
+  const ctx = beginComponent(vnode); // ✅ Pass vnode to track component instance
+  removeErrorOverlay();
+
+  try {
+    const result = await Component(props); // keep context active until DOM creation is done
+
+    const rendered = result ?? null;
+    ctx._vnode = rendered; // ✅ Store rendered vnode // after fully rendered vnode tree
+
+    endComponent();
+    return rendered;
+  } catch (err) {
+    console.error("[RestJS] async render error:", err);
+    showErrorOverlay(err);
+    endComponent();
+    return h("div", { style: "color:red" }, `Error: ${err.message}`);
+  }
+}
+
+/* ----------------------
+    Diff & Patch with Keyed Children
+---------------------- */
+function isSame(a, b) {
+  return a && b && a.type === b.type && a.key === b.key;
+}
+
+export async function patch(parent, newVNode, oldVNode) {
+  if (!newVNode) {
+    if (oldVNode?._domNode?.parentNode) {
+      oldVNode._domNode.parentNode.removeChild(oldVNode._domNode);
+      unmountVNode(oldVNode);
+    }
+    return;
+  }
+
+  const isOldText =
+    typeof oldVNode === "string" ||
+    typeof oldVNode === "number" ||
+    oldVNode?.type === TEXT;
+  const isNewText =
+    typeof newVNode === "string" ||
+    typeof newVNode === "number" ||
+    newVNode?.type === TEXT;
+
+  // ✅ Handle text nodes
+
+  if (isOldText || isNewText) {
+    const oldTextValue = isOldText
+      ? oldVNode?.type === TEXT
+        ? oldVNode.props.nodeValue
+        : String(oldVNode)
+      : "";
+    const newTextValue = isNewText
+      ? newVNode?.type === TEXT
+        ? newVNode.props.nodeValue
+        : String(newVNode)
+      : "";
+
+    if (oldTextValue !== newTextValue) {
+      if (oldVNode?._domNode) {
+        oldVNode._domNode.textContent = newTextValue;
+      }
+    }
+
+    newVNode._domNode =
+      oldVNode?._domNode || document.createTextNode(newTextValue);
+    return;
+  }
+
+  // ✅ Handle first render or missing oldVNode
+  if (!oldVNode || typeof oldVNode !== "object" || !oldVNode.type) {
+    const newDom = await createDom(newVNode);
+    parent.appendChild(newDom);
+    return;
+  }
+
+  // ✅ Handle function components
+  if (typeof newVNode.type === "function") {
+    if (!isSame(oldVNode, newVNode)) {
+      const newDom = await createDom(newVNode);
+      oldVNode._domNode?.parentNode?.replaceChild(newDom, oldVNode._domNode);
+      unmountVNode(oldVNode);
+      return;
+    }
+
+    const ctx = componentInstances.get(oldVNode);
+    if (ctx) {
+      componentInstances.set(newVNode, ctx);
+      ctx._vnode = newVNode;
+    }
+
+    const rendered = await renderMaybeAsyncComponent(
+      newVNode.type,
+      newVNode.props,
+      newVNode
+    );
+
+    newVNode._rendered = rendered;
+    newVNode._domNode = oldVNode._domNode;
+    const componentParentDom = oldVNode._domNode?.parentNode || parent;
+    await patch(componentParentDom, rendered, oldVNode._rendered);
+    return;
+  }
+
+  // ✅ Handle standard DOM elements
+  if (!isSame(oldVNode, newVNode)) {
+    const newDom = await createDom(newVNode);
+    oldVNode._domNode?.parentNode?.replaceChild(newDom, oldVNode._domNode);
+    unmountVNode(oldVNode);
+    newVNode._domNode = newDom;
+    return;
+  }
+
+  const el = (newVNode._domNode = oldVNode._domNode);
+
+  // ✅ Special case for <input> elements
+  if (el.tagName === "INPUT") {
+    const newValue = newVNode.props?.value ?? "";
+    if (el.value !== newValue) el.value = newValue;
+  }
+
+  updateProps(el, newVNode.props, oldVNode.props);
+
+  const oldChildren = oldVNode.props?.children || [];
+  const newChildren = newVNode.props?.children || [];
+  const maxLen = Math.max(oldChildren.length, newChildren.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const oldChild = oldChildren[i];
+    const newChild = newChildren[i];
+
+    if (!oldChild && newChild) {
+      el.appendChild(await createDom(newChild));
+      continue;
+    }
+
+    if (oldChild && !newChild) {
+      el.removeChild(oldChild._domNode);
+      unmountVNode(oldChild);
+      continue;
+    }
+
+    if (oldChild && newChild) {
+      await patch(el, newChild, oldChild);
+    }
+  }
+}
+
+/* ----------------------
+    Unmount Cleanup (Effects)
+---------------------- */
+function unmountVNode(vnode) {
+  if (!vnode) return; // Component cleanup
+
+  if (typeof vnode.type === "function") {
+    const ctx = componentInstances.get(vnode);
+    if (ctx) {
+      // 🎯 CRITICAL FIX: Run all state subscription cleanups
+      if (ctx._subscriptionCleanups)
+        ctx._subscriptionCleanups.forEach((unsub) => unsub()); // Execute all cleanups associated with the component instance
+
+      if (ctx.cleanups) ctx.cleanups.forEach((c) => c?.()); // Clear the instance map to ensure effects run again on remount
+      componentInstances.delete(vnode);
+    }
+    unmountVNode(vnode._rendered);
+    return;
+  } // Recurse into children
+
+  if (vnode.props?.children)
+    for (const c of vnode.props.children) unmountVNode(c);
+}
+
+/* ----------------------
+    Props Update
+---------------------- */
+function updateProps(el, newProps = {}, oldProps = {}) {
+  // ... (Props update logic remains the same) ...
+  if (!el || el.nodeType !== 1) return; // Remove old props that are not in new props
+
+  for (const k of Object.keys(oldProps)) {
+    if (k === "children") continue;
+    if (!(k in newProps)) {
+      if (k.startsWith("r-")) {
+        // remove old delegated listener
+        const eid = el._rest_eid;
+        if (eid && delegatedEvents.has(k.slice(2).toLowerCase())) {
+          delegatedEvents.get(k.slice(2).toLowerCase()).delete(eid);
+        }
+      } else {
+        el.removeAttribute(k);
+      }
+    }
+  } // Add or update new props
+
+  for (const [k, v] of Object.entries(newProps)) {
+    if (k === "children") continue;
+
+    if (k.startsWith("r-")) {
+      // Always ensure the element has an _rest_eid
+      if (!el._rest_eid) el._rest_eid = ++eventIdCounter; // ✅ Always re-register handler to capture latest closure
+      registerDelegatedHandler(el, k.slice(2).toLowerCase(), v);
+    } else if (k === "className" || k === "class") {
+      if (oldProps[k] !== v) el.setAttribute("class", v);
+    } else if (k === "style" && typeof v === "object") {
+      Object.assign(el.style, v);
+    } else if (oldProps[k] !== v && v != null && v !== false) {
+      el.setAttribute(k, v);
+    }
+  }
+}
+
+/* ----------------------
+    Mount / Hydrate
+---------------------- */
+export function mount(AppComponent, root, hydrate = false) {
+  // ... (Mount logic remains the same) ...
+  // ✅ Fix: Ensure root is always a valid Element
+  if (typeof root === "string") root = document.querySelector(root);
+  if (!(root instanceof Element)) {
+    console.error("[RestJS] Mount error: Invalid root element:", root);
+    return;
+  }
+
+  let Component = AppComponent;
+  let oldVNode = null;
+
+  async function renderApp() {
+    try {
+      removeErrorOverlay(); // ✅ CRITICAL: Create component vnode to force re-execution
+
+      const AppVNode = {
+        type: Component,
+        props: {},
+        key: null,
+      };
+
+      if (!oldVNode) {
+        root.innerHTML = "";
+        root.appendChild(await createDom(AppVNode));
+      } else {
+        await patch(root, AppVNode, oldVNode);
+      }
+      oldVNode = AppVNode;
+    } catch (err) {
+      console.error("[RestJS] Mount error:", err);
+      showErrorOverlay(err);
+    }
+  } // ✅ Store the render function globally
+
+  rootRenderFn = renderApp;
+  window.__rest_rerender = renderApp;
+
+  renderApp();
+
+  if (import.meta.hot) {
+    if (!window.__rest_hmr) {
+      window.__rest_hmr = async ({ id, mod }) => {
+        try {
+          const UpdatedComponent = mod.App || mod.default;
+          if (UpdatedComponent) {
+            Component = UpdatedComponent;
+            window.__rest_rerender?.();
+          }
+        } catch (err) {
+          console.error("[RestJS HMR] update error:", err);
+          showErrorOverlay(err);
+        }
+      };
+      import.meta.hot.accept();
+    }
+  }
+}
+
+/* ----------------------
+    SSR: renderToString
+---------------------- */
+export function renderToString(vnode) {
+  // ... (SSR logic remains the same) ...
+  if (!vnode) return "";
+  if (vnode.type === TEXT) return vnode.props.nodeValue;
+  if (vnode.type === Fragment)
+    return (vnode.props?.children || []).map(renderToString).join("");
+  if (typeof vnode.type === "function")
+    return renderToString(renderComponent(vnode.type, vnode.props));
+
+  const propsStr = Object.entries(vnode.props || {})
+    .filter(([k]) => k !== "children")
+    .map(([k, v]) => `${k === "className" ? "class" : k}="${v}"`)
+    .join(" ");
+
+  const childrenStr = (vnode.props?.children || [])
+    .map(renderToString)
+    .join("");
+  return `<${vnode.type}${propsStr ? " " + propsStr : ""}>${childrenStr}</${
+    vnode.type
+  }>`;
+}

@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cn {
+  padding: 20px;
+  background: blue;
+}
