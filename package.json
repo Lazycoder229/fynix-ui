@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "main": "core/fynix/index.js",
   "type": "module",
+  "exports": {
+    ".": "./core/fynix/index.js",
+    "./runtime": "./core/runtime.js",
+    "./router": "./core/router/router.js",
+    "./hooks/*": "./core/hooks/*.js"
+  },
   "scripts": {
-    "dev": "vite"
+    "build": "echo 'Framework core only - no build needed'"
   },
   "keywords": ["fynix", "ui", "framework", "reactive", "jsx", "vite"],
   "author": "Lazycoder229",

@@ -4,9 +4,6 @@ import path from "path";
 import { resPlugin } from "./vite-plugin-res";
 
 export default defineConfig({
-  //  Root points to your app's entry directory
-  root: "app/View",
-
   resolve: {
     alias: {
       "@fynix": path.resolve(__dirname, "core/fynix"),
