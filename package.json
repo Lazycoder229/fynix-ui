@@ -1,5 +1,5 @@
 {
-  "name": "fynix-ui",
+  "name": "@fynixjs/core",
   "version": "1.0.0",
   "main": "core/fynix/index.js",
   "type": "module",
@@ -9,13 +9,34 @@
     "./router": "./core/router/router.js",
     "./hooks/*": "./core/hooks/*.js"
   },
+  "files": [
+    "core",
+    "docs",
+    "vite-plugin-res.js",
+    "vite.config.js",
+    "README.md"
+  ],
   "scripts": {
-    "build": "echo 'Framework core only - no build needed'"
+    "build": "echo 'Framework core only - no build needed'",
+    "prepublishOnly": "echo 'Ready to publish'"
   },
-  "keywords": ["fynix", "ui", "framework", "reactive", "jsx", "vite"],
+  "keywords": [
+    "fynix",
+    "fynixjs",
+    "ui",
+    "framework",
+    "reactive",
+    "jsx",
+    "vite",
+    "hooks",
+    "router"
+  ],
   "author": "Lazycoder229",
   "license": "MIT",
   "description": "Fynix UI - A lightweight, reactive UI framework with JSX support",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Lazycoder229/fynix-ui.git"
