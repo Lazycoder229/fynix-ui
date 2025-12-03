@@ -1,71 +1,90 @@
 import { mount } from "../runtime.js";
 
-export function fynixCreate() {
+export function fynixCreate(customRoutes) {
   let rootSelector = "#app-root";
   let currentPath = null;
-  const routes = {};
+  const routes = customRoutes || {};
   const dynamicRoutes = [];
 
-  console.log("[Router] Current file path:", import.meta.url);
+  console.log("[Router] Custom routes received:", customRoutes);
 
-  //  Try multiple possible paths
-  let modules = import.meta.glob("../../../app/View/**/*.{js,jsx,res}", {
-    eager: true,
-  });
+  // Skip auto-discovery if custom routes provided
+  if (!customRoutes) {
+    console.log("[Router] Current file path:", import.meta.url);
 
-  // If empty, try other common paths
-  if (Object.keys(modules).length === 0) {
-    modules = import.meta.glob("../../app/View/**/*.{js,jsx,res}", {
+    //  Try multiple possible paths for src/View
+    let modules = import.meta.glob("../../../src/View/**/*.{js,jsx,res}", {
       eager: true,
     });
-  }
-  if (Object.keys(modules).length === 0) {
-    modules = import.meta.glob("../app/View/**/*.{js,jsx,res}", {
-      eager: true,
-    });
-  }
-  if (Object.keys(modules).length === 0) {
-    modules = import.meta.glob("/app/View/**/*.{js,jsx,res}", { eager: true });
-  }
-  if (Object.keys(modules).length === 0) {
-    modules = import.meta.glob("./app/View/**/*.{js,jsx,res}", { eager: true });
-  }
 
-  console.log("[Router] Found modules:", Object.keys(modules));
-
-  // Auto-map components to routes (Next.js convention)
-  for (const [path, mod] of Object.entries(modules)) {
-    let route = path
-      .replace(/^.*\/View/, "")
-      .replace(/\.(js|res)$/, "")
-      .replace(/\/view$/, "")
-      .replace(/\/index$/, "");
-
-    if (!route || route === "/") {
-      route = "/";
-    }
-
-    const hasDynamicSegment = /\[([^\]]+)\]/g.test(route);
-    if (hasDynamicSegment) {
-      const dynamicRoute = route.replace(/\[([^\]]+)\]/g, ":$1");
-      dynamicRoutes.push({
-        pattern: dynamicRoute,
-        regex: new RegExp(
-          "^" + dynamicRoute.replace(/:[^\/]+/g, "([^/]+)") + "$"
-        ),
-        component: mod.default || mod[Object.keys(mod)[0]],
-        params: [...dynamicRoute.matchAll(/:([^\/]+)/g)].map((m) => m[1]),
+    // If empty, try app/View paths
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("../../../app/View/**/*.{js,jsx,res}", {
+        eager: true,
       });
-      console.log(`[Router] Dynamic route: ${route} → ${dynamicRoute}`);
-      continue;
+    }
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("../../src/View/**/*.{js,jsx,res}", {
+        eager: true,
+      });
+    }
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("../../app/View/**/*.{js,jsx,res}", {
+        eager: true,
+      });
+    }
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("../app/View/**/*.{js,jsx,res}", {
+        eager: true,
+      });
+    }
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("/app/View/**/*.{js,jsx,res}", {
+        eager: true,
+      });
+    }
+    if (Object.keys(modules).length === 0) {
+      modules = import.meta.glob("./app/View/**/*.{js,jsx,res}", {
+        eager: true,
+      });
     }
 
-    const component =
-      mod.default || mod[Object.keys(mod)[0]] || Object.values(mod)[0];
+    console.log("[Router] Found modules:", Object.keys(modules));
 
-    if (component) {
-      routes[route || "/"] = component;
-      console.log(`[Router] Static route: ${route || "/"}`);
+    // Auto-map components to routes (Next.js convention)
+    for (const [path, mod] of Object.entries(modules)) {
+      let route = path
+        .replace(/^.*\/View/, "")
+        .replace(/\.(js|res)$/, "")
+        .replace(/\/view$/, "")
+        .replace(/\/index$/, "");
+
+      if (!route || route === "/") {
+        route = "/";
+      }
+
+      const hasDynamicSegment = /\[([^\]]+)\]/g.test(route);
+      if (hasDynamicSegment) {
+        const dynamicRoute = route.replace(/\[([^\]]+)\]/g, ":$1");
+        dynamicRoutes.push({
+          pattern: dynamicRoute,
+          regex: new RegExp(
+            "^" + dynamicRoute.replace(/:[^\/]+/g, "([^/]+)") + "$"
+          ),
+          component: mod.default || mod[Object.keys(mod)[0]],
+          params: [...dynamicRoute.matchAll(/:([^\/]+)/g)].map((m) => m[1]),
+        });
+        console.log(`[Router] Dynamic route: ${route} → ${dynamicRoute}`);
+        continue;
+      }
+
+      const component =
+        mod.default || mod[Object.keys(mod)[0]] || Object.values(mod)[0];
+
+      if (component) {
+        routes[route || "/"] = component;
+        console.log(`[Router] Static route: ${route || "/"}`);
+      }
     }
   }
 
@@ -314,3 +333,57 @@ export function fynixCreate() {
 
 // Backward compatibility
 export const restCreate = fynixCreate;
+
+// Simple router helper - accepts glob results directly
+export function createRouter(globModules, rootSelector = "#root") {
+  const routes = {};
+
+  // Convert glob results to routes
+  for (const [path, mod] of Object.entries(globModules)) {
+    const route = path.replace(/^\./, "").replace(/\/view\.js$/, "") || "/";
+    routes[route] = mod.default;
+  }
+
+  let mounted = false;
+
+  const render = () => {
+    requestAnimationFrame(() => {
+      const Page = routes[location.pathname] || routes["/"];
+      const root = document.querySelector(rootSelector);
+
+      if (!root) {
+        console.error("[Router] Root element not found:", rootSelector);
+        return;
+      }
+
+      if (Page) {
+        root.innerHTML = "";
+        requestAnimationFrame(() => {
+          mount(Page, rootSelector);
+          mounted = true;
+        });
+      } else {
+        root.innerHTML = "<h2>404 Not Found</h2>";
+      }
+    });
+  };
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[href]");
+    if (
+      a?.href.startsWith(location.origin) &&
+      routes[new URL(a.href).pathname]
+    ) {
+      e.preventDefault();
+      history.pushState({}, "", a.href);
+      render();
+    }
+  });
+
+  addEventListener("popstate", render);
+
+  return {
+    render,
+    routes,
+  };
+}
