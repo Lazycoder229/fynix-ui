@@ -1,4 +1,4 @@
-import { Rest } from "../runtime.js";
+import { Rest, nixState } from "../runtime.js";
 
 /**
  * @typedef {Object} PathProps
@@ -7,23 +7,36 @@ import { Rest } from "../runtime.js";
  * @property {Object} [props] - Props to pass to the next route
  */
 
-let propsCounter = 0; // Add a counter for uniqueness
+/** Unique counter for props keys */
+let propsCounter = 0;
 
+/**
+ * SPA navigation link for Fynix router
+ * @param {PathProps & Record<string, any>} options
+ * @returns {HTMLElement} anchor element
+ */
 export function Path({
   to = "#",
   value = "",
   props: routeProps = {},
   ...attrs
 }) {
-  // Store a reference to props in window for retrieval
-  const propsKey = `__pathProps_${Date.now()}_${propsCounter++}`;
-  window[propsKey] = routeProps;
+  // Wrap plain props in nixState if not already
+  const wrappedProps = {};
+  for (const [k, v] of Object.entries(routeProps)) {
+    wrappedProps[k] = v && v._isNixState ? v : nixState(v);
+  }
 
+  // Generate a unique key for this props object
+  const propsKey = `__pathProps_${Date.now()}_${propsCounter++}`;
+  window[propsKey] = wrappedProps;
+
+  // Create the anchor element
   const el = Rest(
     "a",
     {
       href: to,
-      "data-rest-link": true,
+      "data-fynix-link": true, // SPA link detection
       "data-props-key": propsKey,
       ...attrs,
     },
