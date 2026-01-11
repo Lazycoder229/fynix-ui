@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "preserve",
+    "jsxFactory": "Fynix",
+    "jsxFragmentFactory": "Fynix.Fragment",
+    "baseUrl": ".",
+    "paths": {
+      "fynix-core": ["./node_modules/fynix-core"],
+      "fynix-core/*": ["./node_modules/fynix-core/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/fynix-core/types"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "src/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}

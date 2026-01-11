@@ -1,0 +1,63 @@
+{
+  "name": "fynix-core",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Core package for Fynix UI framework.",
+  "main": "dist/runtime.js",
+  "types": "runtime.d.ts",
+  "exports": {
+    ".": "./dist/runtime.js",
+    "./context": "./dist/context/context.js",
+    "./custom": "./dist/custom/index.js",
+    "./custom/button": "./dist/custom/button.js",
+    "./custom/path": "./dist/custom/path.js",
+    "./error": "./dist/error/errorOverlay.js",
+    "./fynix": "./dist/fynix/index.js",
+    "./hooks/nixAsync": "./dist/hooks/nixAsync.js",
+    "./hooks/nixAsyncCache": "./dist/hooks/nixAsyncCache.js",
+    "./hooks/nixAsyncDebounce": "./dist/hooks/nixAsyncDebounce.js",
+    "./hooks/nixAsyncQuery": "./dist/hooks/nixAsyncQuery.js",
+    "./hooks/nixCallback": "./dist/hooks/nixCallback.js",
+    "./hooks/nixComputed": "./dist/hooks/nixComputed.js",
+    "./hooks/nixDebounce": "./dist/hooks/nixDebounce.js",
+    "./hooks/nixEffect": "./dist/hooks/nixEffect.js",
+    "./hooks/nixForm": "./dist/hooks/nixForm.js",
+    "./hooks/nixFormAsync": "./dist/hooks/nixFormAsync.js",
+    "./hooks/nixInterval": "./dist/hooks/nixInterval.js",
+    "./hooks/nixLazy": "./dist/hooks/nixLazy.js",
+    "./hooks/nixLazyAsync": "./dist/hooks/nixLazyAsync.js",
+    "./hooks/nixLazyFormAsync": "./dist/hooks/nixLazyFormAsync.js",
+    "./hooks/nixLocalStorage": "./dist/hooks/nixLocalStorage.js",
+    "./hooks/nixMemo": "./dist/hooks/nixMemo.js",
+    "./hooks/nixPrevious": "./dist/hooks/nixPrevious.js",
+    "./hooks/nixRef": "./dist/hooks/nixRef.js",
+    "./hooks/nixState": "./dist/hooks/nixState.js",
+    "./hooks/nixStore": "./dist/hooks/nixStore.js",
+    "./plugins/vite-plugin-res": "./dist/plugins/vite-plugin-res.js",
+    "./router": "./dist/router/router.js",
+    "./types/jsx": "./types/jsx.d.ts",
+    "./types/global": "./types/global.d.ts"
+  },
+  "files": [
+    "dist/",
+    "types/",
+    "runtime.d.ts",
+    "router/"
+  ],
+  "keywords": [
+    "fynix",
+    "ui",
+    "framework",
+    "core"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "esbuild": "^0.20.0",
+    "vite": "^7.3.0"
+  },
+  "scripts": {
+    "build": "node build.js"
+  }
+}

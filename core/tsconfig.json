@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "outDir": "./dist",
+    
+    // Match esbuild config
+    "jsx": "preserve",
+    "jsxFactory": "Fynix",
+    "jsxFragmentFactory": "Fynix.Fragment",
+    
+    "baseUrl": ".",
+    "paths": {
+      "fynix-core": ["./runtime.js"],
+      "fynix-core/*": ["./*"]
+    },
+    
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "types": ["node"]
+  },
+  
+  "include": [
+    "./**/*",
+    "context/**/*",
+    "custom/**/*",
+    "error/**/*",
+    "hooks/**/*",
+    "plugins/**/*",
+    "router/**/*",
+    "types/**/*"
+  ],
+  
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}
