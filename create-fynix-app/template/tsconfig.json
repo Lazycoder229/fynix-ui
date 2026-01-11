@@ -4,11 +4,13 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "moduleResolution": "bundler",
+      "noEmit": true ,
     "allowJs": true,
     "checkJs": false,
     "jsx": "preserve",
     "jsxFactory": "Fynix",
     "jsxFragmentFactory": "Fynix.Fragment",
+  
     "baseUrl": ".",
     "paths": {
       "fynix-core": ["./node_modules/fynix-core"],

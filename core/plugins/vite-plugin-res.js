@@ -7,7 +7,7 @@ export function fynix() {
 
     async transform(code, id) {
       if (!id.includes("/src/")) return null;
-      if (!id.endsWith(".js") && !id.endsWith(".jsx") && !id.endsWith(".fnx")) return null;
+      if (!id.endsWith(".ts") && !id.endsWith(".js") && !id.endsWith(".fnx")) return null;
       this.addWatchFile(id);
 
       const result = await transform(code, {
@@ -25,7 +25,7 @@ export function fynix() {
     },
 
     handleHotUpdate({ file, server }) {
-      if (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".fnx")) {
+      if (file.endsWith(".ts") || file.endsWith(".js") || file.endsWith(".fnx")) {
         server.ws.send({ type: "full-reload" });
         return [];
       }

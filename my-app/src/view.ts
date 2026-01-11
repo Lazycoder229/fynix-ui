@@ -1,9 +1,8 @@
 import { Fynix, Path } from "fynix-core";
-import UserPage from "./user/view";
 
 export default function Home() {
   return (
-    <div rc="flex flex-col min-h-screen bg-white text-gray-900 items-center justify-center px-6 py-16">
+    <div r-class="flex flex-col min-h-screen bg-white text-gray-900 items-center justify-center px-6 py-16">
       {/* Logo & Title */}
       <img src="/fynixlogo.png" alt="Fynix Logo" rc="w-32 h-32 mb-6 logo" />
       <h1 rc="text-4xl font-bold mb-4">FynixJS v1.0.0</h1>
@@ -49,7 +48,7 @@ export default function Home() {
 }
 
 // Static meta
-Home.meta = {
+Home.meta= {
   title: "Home - FynixJS",
   description: "Welcome to the FynixJS framework!",
   keywords: "fynix, javascript, framework",

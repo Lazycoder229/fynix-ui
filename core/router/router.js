@@ -90,7 +90,7 @@ function sanitizePath(path) {
 function tryGlobPaths() {
   try {
     // @ts-ignore - Vite glob API
-    const modules = import.meta.glob("/src/**/*.{js,jsx,fnx}", { eager: true });
+    const modules = import.meta.glob("/src/**/*.{ts,js,jsx,fnx}", { eager: true });
     return modules || {};
   } catch (error) {
     console.error('[Router] Failed to load modules:', error);

@@ -4,11 +4,13 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "moduleResolution": "bundler",
+      "noEmit": true ,
     "allowJs": true,
     "checkJs": false,
     "jsx": "preserve",
     "jsxFactory": "Fynix",
     "jsxFragmentFactory": "Fynix.Fragment",
+     "jsxImportSource": "fynix-core",
     "baseUrl": ".",
     "paths": {
       "fynix-core": ["./node_modules/fynix-core"],
@@ -21,7 +23,7 @@
   },
   "include": [
     "src/**/*",
-    "src/**/*.js"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

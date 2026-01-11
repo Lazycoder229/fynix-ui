@@ -8,7 +8,7 @@ export default defineConfig({
   
     esbuild: {
       loader: 'jsx',
-      include: /\.(js|jsx|fnx)$/,
+      include: /\.(ts|js|fnx)$/,
       jsxFactory: 'Fynix',
       jsxFragment: 'Fynix.Fragment',
     },
