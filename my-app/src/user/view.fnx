@@ -1,0 +1,27 @@
+<logic setup="ts">
+import { nixState, Path  } from "@fynixorg/ui";
+
+const userName = nixState("John Doe");
+
+
+</logic>
+
+<view>
+  <div>
+    <h1>User Profile</h1>
+    <p>Welcome, {userName.value}!</p>
+    
+    <Path to="/" value="Go Back Home" />
+  </div>
+</view>
+
+<style scoped>
+div {
+  padding: 40px;
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+}
+</style>

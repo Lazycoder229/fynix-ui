@@ -1,44 +1,82 @@
+// =====================================================
+// tsconfig.json - Development Configuration
+// =====================================================
 {
   "compilerOptions": {
+    // Language and Environment
     "target": "ES2020",
-    "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowJs": true,
-    "checkJs": true,
-    "declaration": false,
-    "emitDeclarationOnly": false,
-    "outDir": "./dist",
-    
-    // Match esbuild config
+
+    // JSX Configuration
     "jsx": "preserve",
     "jsxFactory": "Fynix",
     "jsxFragmentFactory": "Fynix.Fragment",
-    
+
+    // Type Checking
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Module Resolution
     "baseUrl": ".",
     "paths": {
-      "fynix-core": ["./runtime.js"],
-      "fynix-core/*": ["./*"]
+      "@fynixorg/ui": ["./runtime.ts"],
+      "@fynixorg/ui/*": ["./*"]
     },
-    
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // JavaScript Support
+    "allowJs": true,
+    "checkJs": false,
+
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "declarationDir": "./dist/types",
+    "removeComments": false,
+    "importHelpers": false,
+    "importsNotUsedAsValues": "remove",
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "newLine": "lf",
+
+    // Interop Constraints
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "forceConsistentCasingInFileNames": true,
+
+    // Type Roots - Your existing types folder
     "typeRoots": ["./node_modules/@types", "./types"],
-    "types": ["node"]
+    "types": ["node"],
+
+    // Skip Library Check for faster builds
+    "skipLibCheck": true
   },
-  
+
   "include": [
-    "./**/*",
-    "context/**/*",
-    "custom/**/*",
-    "error/**/*",
-    "hooks/**/*",
-    "plugins/**/*",
-    "router/**/*",
-    "types/**/*"
+    "runtime.ts",
+    "context/**/*.ts",
+    "custom/**/*.ts",
+    "error/**/*.ts",
+    "hooks/**/*.ts",
+    "plugins/**/*.ts",
+    "router/**/*.ts",
+    "types/**/*.d.ts"
   ],
-  
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build"
-  ]
+
+  "exclude": ["node_modules", "dist", "build", "**/*.test.ts", "**/*.spec.ts"]
 }

@@ -1,63 +1,247 @@
 {
-  "name": "fynix-core",
-  "version": "1.0.0",
+  "name": "@fynixorg/ui",
+  "version": "1.0.11",
   "type": "module",
-  "description": "Core package for Fynix UI framework.",
-  "main": "dist/runtime.js",
-  "types": "runtime.d.ts",
+  "description": "Core package for Fynix UI framework - A lightweight, reactive UI framework with TypeScript support.",
+  "main": "./dist/fynix/index.js",
+  "module": "./dist/fynix/index.js",
+  "types": "./dist/fynix/index.d.ts",
   "exports": {
-    ".": "./dist/runtime.js",
-    "./context": "./dist/context/context.js",
-    "./custom": "./dist/custom/index.js",
-    "./custom/button": "./dist/custom/button.js",
-    "./custom/path": "./dist/custom/path.js",
-    "./error": "./dist/error/errorOverlay.js",
-    "./fynix": "./dist/fynix/index.js",
-    "./hooks/nixAsync": "./dist/hooks/nixAsync.js",
-    "./hooks/nixAsyncCache": "./dist/hooks/nixAsyncCache.js",
-    "./hooks/nixAsyncDebounce": "./dist/hooks/nixAsyncDebounce.js",
-    "./hooks/nixAsyncQuery": "./dist/hooks/nixAsyncQuery.js",
-    "./hooks/nixCallback": "./dist/hooks/nixCallback.js",
-    "./hooks/nixComputed": "./dist/hooks/nixComputed.js",
-    "./hooks/nixDebounce": "./dist/hooks/nixDebounce.js",
-    "./hooks/nixEffect": "./dist/hooks/nixEffect.js",
-    "./hooks/nixForm": "./dist/hooks/nixForm.js",
-    "./hooks/nixFormAsync": "./dist/hooks/nixFormAsync.js",
-    "./hooks/nixInterval": "./dist/hooks/nixInterval.js",
-    "./hooks/nixLazy": "./dist/hooks/nixLazy.js",
-    "./hooks/nixLazyAsync": "./dist/hooks/nixLazyAsync.js",
-    "./hooks/nixLazyFormAsync": "./dist/hooks/nixLazyFormAsync.js",
-    "./hooks/nixLocalStorage": "./dist/hooks/nixLocalStorage.js",
-    "./hooks/nixMemo": "./dist/hooks/nixMemo.js",
-    "./hooks/nixPrevious": "./dist/hooks/nixPrevious.js",
-    "./hooks/nixRef": "./dist/hooks/nixRef.js",
-    "./hooks/nixState": "./dist/hooks/nixState.js",
-    "./hooks/nixStore": "./dist/hooks/nixStore.js",
-    "./plugins/vite-plugin-res": "./dist/plugins/vite-plugin-res.js",
-    "./router": "./dist/router/router.js",
-    "./types/jsx": "./types/jsx.d.ts",
-    "./types/global": "./types/global.d.ts"
+    ".": {
+      "types": "./dist/fynix/index.d.ts",
+      "import": "./dist/fynix/index.js",
+      "default": "./dist/fynix/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    },
+    "./context": {
+      "types": "./dist/context/context.d.ts",
+      "import": "./dist/context/context.js"
+    },
+    "./custom": {
+      "types": "./dist/custom/index.d.ts",
+      "import": "./dist/custom/index.js"
+    },
+    "./custom/button": {
+      "types": "./dist/custom/button.d.ts",
+      "import": "./dist/custom/button.js"
+    },
+    "./custom/path": {
+      "types": "./dist/custom/path.d.ts",
+      "import": "./dist/custom/path.js"
+    },
+    "./error": {
+      "types": "./dist/error/errorOverlay.d.ts",
+      "import": "./dist/error/errorOverlay.js"
+    },
+    "./router": {
+      "types": "./dist/router/router.d.ts",
+      "import": "./dist/router/router.js"
+    },
+    "./hooks/nixState": {
+      "types": "./dist/hooks/nixState.d.ts",
+      "import": "./dist/hooks/nixState.js"
+    },
+    "./hooks/nixStore": {
+      "types": "./dist/hooks/nixStore.d.ts",
+      "import": "./dist/hooks/nixStore.js"
+    },
+    "./hooks/nixEffect": {
+      "types": "./dist/hooks/nixEffect.d.ts",
+      "import": "./dist/hooks/nixEffect.js"
+    },
+    "./hooks/nixAsync": {
+      "types": "./dist/hooks/nixAsync.d.ts",
+      "import": "./dist/hooks/nixAsync.js"
+    },
+    "./hooks/nixAsyncCache": {
+      "types": "./dist/hooks/nixAsyncCache.d.ts",
+      "import": "./dist/hooks/nixAsyncCache.js"
+    },
+    "./hooks/nixAsyncDebounce": {
+      "types": "./dist/hooks/nixAsyncDebounce.d.ts",
+      "import": "./dist/hooks/nixAsyncDebounce.js"
+    },
+    "./hooks/nixAsyncQuery": {
+      "types": "./dist/hooks/nixAsyncQuery.d.ts",
+      "import": "./dist/hooks/nixAsyncQuery.js"
+    },
+    "./hooks/nixCallback": {
+      "types": "./dist/hooks/nixCallback.d.ts",
+      "import": "./dist/hooks/nixCallback.js"
+    },
+    "./hooks/nixComputed": {
+      "types": "./dist/hooks/nixComputed.d.ts",
+      "import": "./dist/hooks/nixComputed.js"
+    },
+    "./hooks/nixDebounce": {
+      "types": "./dist/hooks/nixDebounce.d.ts",
+      "import": "./dist/hooks/nixDebounce.js"
+    },
+    "./hooks/nixForm": {
+      "types": "./dist/hooks/nixForm.d.ts",
+      "import": "./dist/hooks/nixForm.js"
+    },
+    "./hooks/nixFormAsync": {
+      "types": "./dist/hooks/nixFormAsync.d.ts",
+      "import": "./dist/hooks/nixFormAsync.js"
+    },
+    "./hooks/nixInterval": {
+      "types": "./dist/hooks/nixInterval.d.ts",
+      "import": "./dist/hooks/nixInterval.js"
+    },
+    "./hooks/nixLazy": {
+      "types": "./dist/hooks/nixLazy.d.ts",
+      "import": "./dist/hooks/nixLazy.js"
+    },
+    "./hooks/nixLazyAsync": {
+      "types": "./dist/hooks/nixLazyAsync.d.ts",
+      "import": "./dist/hooks/nixLazyAsync.js"
+    },
+    "./hooks/nixLazyFormAsync": {
+      "types": "./dist/hooks/nixLazyFormAsync.d.ts",
+      "import": "./dist/hooks/nixLazyFormAsync.js"
+    },
+    "./hooks/nixLocalStorage": {
+      "types": "./dist/hooks/nixLocalStorage.d.ts",
+      "import": "./dist/hooks/nixLocalStorage.js"
+    },
+    "./hooks/nixMemo": {
+      "types": "./dist/hooks/nixMemo.d.ts",
+      "import": "./dist/hooks/nixMemo.js"
+    },
+    "./hooks/nixPrevious": {
+      "types": "./dist/hooks/nixPrevious.d.ts",
+      "import": "./dist/hooks/nixPrevious.js"
+    },
+    "./hooks/nixRef": {
+      "types": "./dist/hooks/nixRef.d.ts",
+      "import": "./dist/hooks/nixRef.js"
+    },
+    "./plugins/vite-plugin-res": {
+      "types": "./dist/plugins/vite-plugin-res.d.ts",
+      "import": "./dist/plugins/vite-plugin-res.js"
+    },
+    "./types": {
+      "types": "./types/index.d.ts"
+    },
+    "./types/jsx": {
+      "types": "./types/jsx.d.ts"
+    },
+    "./types/global": {
+      "types": "./types/global.d.ts"
+    },
+    "./types/fnx": {
+      "types": "./types/fnx.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/",
     "types/",
-    "runtime.d.ts",
-    "router/"
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "fynix",
     "ui",
     "framework",
-    "core"
+    "reactive",
+    "typescript",
+    "jsx",
+    "virtual-dom",
+    "hooks",
+    "router",
+    "state-management"
   ],
-  "author": "Your Name",
+  "author": {
+    "name": "Resty Gonzales",
+    "email": "your.email@example.com",
+    "url": "https://github.com/yourusername"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fynixorg/ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fynixorg/ui/issues"
+  },
+  "homepage": "https://github.com/fynixorg/ui#readme",
   "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^25.0.3",
-    "esbuild": "^0.20.0",
-    "vite": "^7.3.0"
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "node build.js"
+    "dev": "vite",
+    "build": "npm run clean && npm run type-check && npm run build:esbuild && npm run build:types",
+    "build:esbuild": "node build.js",
+    "build:types": "tsc --project tsconfig.build.json",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
+    "clean": "rimraf dist",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build",
+    "version": "npm run format && git add -A",
+    "postversion": "git push && git push --tags"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8",
+    "vite": "^7.1.11"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0",
+    "vite": "^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "sideEffects": false,
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ],
+      "types": [
+        "./types/index.d.ts"
+      ],
+      "types/jsx": [
+        "./types/jsx.d.ts"
+      ],
+      "types/global": [
+        "./types/global.d.ts"
+      ]
+    }
+  },
+  "dependencies": {
+    "fdir": "^6.5.0",
+    "rollup": "^4.56.0"
   }
 }

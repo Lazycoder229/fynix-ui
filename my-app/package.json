@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run type-check && vite build",
+    "dev:clean": "rimraf node_modules/.vite && vite",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
-    "vite": "^7.1.11"
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
   },
   "dependencies": {
+    "@fynixorg/ui": "file:../Fynixorg/ui",
     "@tailwindcss/vite": "^4.1.18",
-    "tailwindcss": "^4.1.18",
-    "fynix-core": "^1.0.0"
+    "fdir": "^6.5.0",
+    "tailwindcss": "^4.1.18"
   }
 }

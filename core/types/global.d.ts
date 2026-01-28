@@ -1,13 +1,38 @@
+/**
+ * Virtual DOM node type for Fynix (unified with runtime.d.ts)
+ */
+type VNode = {
+  type: string | symbol | ((props: any) => any);
+  props: Record<string, any>;
+  key: string | number | null;
+  _domNode?: Node;
+  _rendered?: VNode;
+  _state?: any;
+};
 // global.d.ts - Fynix Global Type Declarations
 
 /**
  * Reactive state object
  */
-interface NixState<T> {
+// types/global.d.ts
+
+/**
+ * Reactive state object - references actual nixState return type
+ */
+export type NixState<T> = {
   value: T;
+  subscribe: (fn: (value: T) => void) => () => void;
+  cleanup: () => void;
+  getSubscriberCount: () => number;
+  isDestroyed: () => boolean;
+  asReadOnly: () => {
+    value: T;
+    subscribe: (fn: (value: T) => void) => () => void;
+    _isNixState: true;
+    _isReadOnly: true;
+  };
   _isNixState: true;
-  subscribe(callback: () => void): () => void;
-}
+};
 
 /**
  * Reactive store object
@@ -47,7 +72,9 @@ interface NixFormState<T extends Record<string, any>> {
   isValid: boolean;
   isSubmitting: boolean;
   errors: { [K in keyof T]?: string };
-  handleSubmit: (onSubmit: (values: T) => void | Promise<void>) => (e?: Event) => Promise<void>;
+  handleSubmit: (
+    onSubmit: (values: T) => void | Promise<void>
+  ) => (e?: Event) => Promise<void>;
   reset: () => void;
   setFieldValue: <K extends keyof T>(field: K, value: T[K]) => void;
   setFieldError: <K extends keyof T>(field: K, error: string) => void;
@@ -86,13 +113,13 @@ interface FynixRouter {
 interface Window {
   /** Cache for router props to prevent memory leaks */
   __fynixPropsCache?: Map<string, any>;
-  
+
   /** Link props namespace for router navigation */
   __fynixLinkProps__?: Record<string, any>;
-  
+
   /** Last route props passed to components */
   __lastRouteProps?: any;
-  
+
   /** Fynix global state and utilities */
   __fynix__?: {
     /** Current route props */
@@ -110,7 +137,7 @@ interface Window {
 interface HTMLElement {
   /** Event delegation ID for r-* event handlers */
   _rest_eid?: number;
-  
+
   /** Fynix internal data storage */
   _fynix_?: any;
 }
@@ -149,7 +176,7 @@ interface ImportMeta {
     /** Custom HMR event handling */
     on?: (event: string, cb: (...args: any[]) => void) => void;
   };
-  
+
   /** Vite glob import function */
   readonly glob: <T = any>(
     pattern: string,
@@ -157,12 +184,12 @@ interface ImportMeta {
       /** Load modules eagerly (at build time) */
       eager?: boolean;
       /** Import as URL strings */
-      as?: 'url' | 'raw';
+      as?: "url" | "raw";
       /** Custom import query */
       query?: Record<string, string | number | boolean>;
     }
   ) => Record<string, T>;
-  
+
   /** Environment variables */
   readonly env: {
     MODE: string;
@@ -177,42 +204,42 @@ interface ImportMeta {
 /**
  * Module declarations for non-TypeScript files
  */
-declare module '*.css' {
+declare module "*.css" {
   const content: string;
   export default content;
 }
 
-declare module '*.scss' {
+declare module "*.scss" {
   const content: string;
   export default content;
 }
 
-declare module '*.svg' {
+declare module "*.svg" {
   const content: string;
   export default content;
 }
 
-declare module '*.png' {
+declare module "*.png" {
   const content: string;
   export default content;
 }
 
-declare module '*.jpg' {
+declare module "*.jpg" {
   const content: string;
   export default content;
 }
 
-declare module '*.jpeg' {
+declare module "*.jpeg" {
   const content: string;
   export default content;
 }
 
-declare module '*.gif' {
+declare module "*.gif" {
   const content: string;
   export default content;
 }
 
-declare module '*.webp' {
+declare module "*.webp" {
   const content: string;
   export default content;
 }
@@ -220,16 +247,21 @@ declare module '*.webp' {
 /**
  * Fynix-specific module patterns
  */
-declare module '*.fnx' {
-  const Component: any;
+declare module "*.fnx" {
+  /** Fynix component function type */
+  type FynixComponent<P = Record<string, any>> = (props: P) => import("./index").VNode | Promise<import("./index").VNode>;
+  const Component: FynixComponent;
   export default Component;
 }
 
-declare module '*.js' {
+declare module "*.js" {
   const Component: any;
   export default Component;
 }
-
+declare module "*.ts" {
+  const Component: any;
+  export default Component;
+}
 /**
  * Vite client types
  */

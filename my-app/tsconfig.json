@@ -1,33 +1,79 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    // Language and Environment
+    "target": "ESNext",
+    "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "noEmit": false,
     "moduleResolution": "bundler",
-      "noEmit": true ,
-    "allowJs": true,
-    "checkJs": false,
+    
+    // Type Checking
+    "strict": true,
+    
+    // JSX Configuration
     "jsx": "preserve",
+    "jsxImportSource": "@fynixorg/ui",
     "jsxFactory": "Fynix",
     "jsxFragmentFactory": "Fynix.Fragment",
-     "jsxImportSource": "fynix-core",
-    "baseUrl": ".",
+    
+    // Emit
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    
+    // Library
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    
+    // Module Resolution with npm link support
+    "baseUrl": "./",
     "paths": {
-      "fynix-core": ["./node_modules/fynix-core"],
-      "fynix-core/*": ["./node_modules/fynix-core/*"]
+      // Multi-strategy path resolution for npm link
+      "@fynixorg/ui": [
+        "../core/fynix/index.ts",
+        "../core/dist/fynix/index.d.ts",
+        "./node_modules/@fynixorg/ui"
+      ],
+      "@fynixorg/ui/*": [
+        "../core/*",
+        "../core/dist/*",
+        "./node_modules/@fynixorg/ui/*"
+      ],
+      "@/*": ["./src/*"]
     },
+    
+    // Type Roots - Include core types
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/fynix-core/types"
-    ]
+      "../core/types",
+      "../core/node_modules/@types"
+    ],
+    
+    // Include vite types explicitly
+    "types": ["vite/client", "node"],
+    
+    // TypeScript Plugins
+    "plugins": [
+      {
+        "name": "typescript-fynix-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
+    ],
+    
+    // Important for npm link and imports
+    "allowArbitraryExtensions": true,
+    "preserveSymlinks": true,
+    "allowImportingTsExtensions": false
   },
+  
   "include": [
     "src/**/*",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.fnx",
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build"
-  ]
+  
+  "exclude": ["node_modules", "dist", "build"]
 }

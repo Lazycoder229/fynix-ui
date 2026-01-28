@@ -1,0 +1,49 @@
+<logic setup="ts">
+import { nixState } from "@fynixorg/ui";
+import { Path } from "@fynixorg/ui";  // ← Add this import!
+
+const message = nixState("Welcome!");
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const user: User = {
+  id: 2,
+  name: "John Doe",
+  email: "john.doe@example.com"
+};
+
+export const meta = {
+  title: "Home - My Awesome App",
+  description: "Welcome to my awesome application built with Fynix",
+  keywords: "fynix, spa, framework",
+  ogTitle: "My Awesome App",
+  ogDescription: "The best Fynix app you'll ever see",
+  ogImage: "/og-home.png"
+};
+</logic>
+
+<view>
+  <div>
+    <h1 r-class="bg-gray-300">{message.value}</h1>
+    <h2>ID: {user.id}</h2>
+    <p>EMAIL: {user.email}</p>
+    
+    <button r-click={() => message.value = "Hello, Fynix!"}>
+      Click to change message
+    </button>
+    
+  
+    <Path to="/user" value="Go to User Page" />
+  </div>
+</view>
+
+<style scoped>
+div {
+  text-align: center;
+  padding: 60px 20px;
+}
+</style>

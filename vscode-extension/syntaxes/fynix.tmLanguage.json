@@ -1,0 +1,104 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Fynix SFC",
+  "scopeName": "source.fynix",
+  "patterns": [
+    {
+      "include": "#logic-block"
+    },
+    {
+      "include": "#view-block"
+    },
+    {
+      "include": "#style-block"
+    },
+    {
+      "include": "#comments"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.html",
+          "begin": "<!--",
+          "end": "-->",
+          "patterns": [
+            {
+              "name": "comment.block.html",
+              "match": ".*"
+            }
+          ]
+        }
+      ]
+    },
+    "logic-block": {
+      "name": "meta.block.logic.fynix",
+      "begin": "(<)(logic)\\s+(setup)\\s*=\\s*(['\"])(ts|js)(['\"])(>)",
+      "end": "(</)(logic)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "entity.other.attribute-name.html" },
+        "4": { "name": "punctuation.definition.string.begin.html" },
+        "5": { "name": "string.quoted.html" },
+        "6": { "name": "punctuation.definition.string.end.html" },
+        "7": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "patterns": [
+        {
+          "include": "source.ts"
+        }
+      ]
+    },
+    "view-block": {
+      "name": "meta.block.view.fynix",
+      "begin": "(<)(view)(>)",
+      "end": "(</)(view)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "patterns": [
+        {
+          "include": "source.tsx#jsx"
+        },
+        {
+          "include": "source.tsx"
+        }
+      ]
+    },
+    "style-block": {
+      "name": "meta.block.style.fynix",
+      "begin": "(<)(style)(\\s+scoped)?(>)",
+      "end": "(</)(style)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "entity.other.attribute-name.html" },
+        "4": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "patterns": [
+        {
+          "include": "source.css"
+        }
+      ]
+    }
+  }
+}

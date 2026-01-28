@@ -4,39 +4,37 @@ A lightweight, reactive JavaScript framework for building modern web application
 
 ## Features
 
-- 🎯 **Reactive State Management** - Simple hooks like React
-- 🚀 **File-Based Routing** - No route config needed
-- ⚡ **Virtual DOM** - Fast and efficient rendering
-- 🔒 **Security Built-in** - Protected against XSS attacks
-- ⚛️ **JSX Support** - Familiar React-like syntax
-- 🪝 **20+ Hooks** - Everything you need built-in
-- 🔄 **Hot Module Replacement** - Instant updates while coding
-- 📦 **Zero Dependencies** - Lightweight and fast
+- **Reactive State Management** - Simple hooks like React
+- **File-Based Routing** - No route config needed
+- **Virtual DOM** - Fast and efficient rendering
+- **Security Built-in** - Protected against XSS attacks
+- **JSX Support** - Familiar React-like syntax
+- **20+ Hooks** - Everything you need built-in
+- **Hot Module Replacement** - Instant updates while coding
+- **Zero Dependencies** - Lightweight and fast
 
 ## Quick Start
 
 ### Installation
 
 ```bash
-npm install fynix
-# or
-yarn add fynix
-# or
-pnpm add fynix
+npx @fynixorg/cli <app-name>
+
 ```
 
 ## Best Practices
 
-1. ✅ **Always use keys** in lists
-2. ✅ **Return cleanup** from effects when needed
-3. ✅ **Use memoization** for expensive calculations
-4. ✅ **Debounce inputs** that trigger searches
-5. ✅ **Handle loading/error** states in async operations
-6. ✅ **Keep components small** and focused
-7. ✅ **Use global store** for shared state
-8. ✅ **Add SEO meta** to important pages
+1. **Always use keys** in lists
+2. **Return cleanup** from effects when needed
+3. **Use memoization** for expensive calculations
+4. **Debounce inputs** that trigger searches
+5. **Handle loading/error** states in async operations
+6. **Keep components small** and focused
+7. **Use global store** for shared state
+8. **Add SEO meta** to important pages
 
 ## Browser Support
+
 - Modern browsers with ES6+
 
 ## Performance Tips
@@ -51,32 +49,38 @@ pnpm add fynix
 ## Common Issues
 
 ### State not updating?
-Make sure you're using `.value`:
-```jsx
-// ❌ Wrong
-setCount(count + 1)
 
-// ✅ Correct
-setCount(count.value + 1)
+Make sure you're using `.value`:
+
+```js
+//  Wrong
+setCount(count + 1);
+
+// Correct
+setCount(count.value + 1);
 ```
 
 ### Events not working?
+
 Use `r-` prefix:
-```jsx
-// ❌ Wrong
+
+```js
+// Wrong
 <button onClick={...}>
 
-// ✅ Correct
+// Correct
 <button r-click={...}>
 ```
 
 ### Navigation not working?
+
 Add `data-fynix-link`:
+
 ```jsx
-// ❌ Wrong
+//  Wrong
 <a href="/page">Link</a>
 
-// ✅ Correct
+// Correct
 <a href="/page" data-fynix-link>Link</a>
 ```
 
@@ -98,6 +102,7 @@ function MyComponent({ title, count }: Props) {
 ## Contributing
 
 Contributions are welcome! Feel free to:
+
 - Report bugs
 - Suggest features
 - Submit pull requests
@@ -109,8 +114,9 @@ MIT License
 
 ---
 
-**Happy coding with Fynix! 🚀**
+**Happy coding with Fynix! **
 
 For detailed documentation, check out:
+
 - [Runtime Documentation](./RUNTIME.md) - Deep dive into the core
 - [Router Documentation](./ROUTER.md) - Routing system details

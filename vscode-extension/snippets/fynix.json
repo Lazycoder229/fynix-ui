@@ -1,0 +1,258 @@
+{
+  "Fynix Component (TypeScript)": {
+    "prefix": "fnx-ts",
+    "body": [
+      "<logic setup=\"ts\">",
+      "import { nixState } from \"@fynixorg/ui\";",
+      "",
+      "$1",
+      "</logic>",
+      "",
+      "<view>",
+      "  <div>",
+      "    $2",
+      "  </div>",
+      "</view>",
+      "",
+      "<style scoped>",
+      "div {",
+      "  $3",
+      "}",
+      "</style>"
+    ],
+    "description": "Create a Fynix SFC component with TypeScript"
+  },
+  "Fynix Component (JavaScript)": {
+    "prefix": "fnx-js",
+    "body": [
+      "<logic setup=\"js\">",
+      "import { nixState } from \"@fynixorg/ui\";",
+      "",
+      "$1",
+      "</logic>",
+      "",
+      "<view>",
+      "  <div>",
+      "    $2",
+      "  </div>",
+      "</view>",
+      "",
+      "<style scoped>",
+      "div {",
+      "  $3",
+      "}",
+      "</style>"
+    ],
+    "description": "Create a Fynix SFC component with JavaScript"
+  },
+  "Fynix Component with State": {
+    "prefix": "fnx-state",
+    "body": [
+      "<logic setup=\"ts\">",
+      "import { nixState } from \"@fynixorg/ui\";",
+      "",
+      "const ${1:count} = nixState<${2:number}>(${3:0});",
+      "</logic>",
+      "",
+      "<view>",
+      "  <div>",
+      "    <h1>{${1:count}.value}</h1>",
+      "    <button r-click={() => ${1:count}.value++}>Increment</button>",
+      "  </div>",
+      "</view>",
+      "",
+      "<style scoped>",
+      "div {",
+      "  display: flex;",
+      "  flex-direction: column;",
+      "  gap: 1rem;",
+      "}",
+      "</style>"
+    ],
+    "description": "Create a Fynix component with state"
+  },
+  "Logic Block": {
+    "prefix": "logic",
+    "body": ["<logic setup=\"${1|ts,js|}\">", "$2", "</logic>"],
+    "description": "Create a logic block"
+  },
+  "View Block": {
+    "prefix": "view",
+    "body": ["<view>", "  $1", "</view>"],
+    "description": "Create a view block"
+  },
+  "Style Block": {
+    "prefix": "style",
+    "body": ["<style${1| , scoped|}>", "$2", "</style>"],
+    "description": "Create a style block"
+  },
+  "nixState": {
+    "prefix": "nstate",
+    "body": ["const ${1:state} = nixState<${2:type}>(${3:initialValue});"],
+    "description": "Create a nixState"
+  },
+  "nixStore": {
+    "prefix": "nstore",
+    "body": ["const ${1:store} = nixStore({", "  ${2:key}: ${3:value}", "});"],
+    "description": "Create a nixStore"
+  },
+  "Event Handler": {
+    "prefix": "r-click",
+    "body": ["r-click={() => { $1 }}"],
+    "description": "Add click event handler"
+  },
+  
+  "HTML: div": {
+    "prefix": ["div", "<div"],
+    "body": ["<div$1>", "  $0", "</div>"],
+    "description": "HTML div element"
+  },
+  "HTML: span": {
+    "prefix": ["span", "<span"],
+    "body": ["<span$1>$0</span>"],
+    "description": "HTML span element"
+  },
+  "HTML: p": {
+    "prefix": ["p", "<p"],
+    "body": ["<p$1>$0</p>"],
+    "description": "HTML paragraph element"
+  },
+  "HTML: h1": {
+    "prefix": ["h1", "<h1"],
+    "body": ["<h1$1>$0</h1>"],
+    "description": "HTML h1 heading"
+  },
+  "HTML: h2": {
+    "prefix": ["h2", "<h2"],
+    "body": ["<h2$1>$0</h2>"],
+    "description": "HTML h2 heading"
+  },
+  "HTML: h3": {
+    "prefix": ["h3", "<h3"],
+    "body": ["<h3$1>$0</h3>"],
+    "description": "HTML h3 heading"
+  },
+  "HTML: button": {
+    "prefix": ["button", "<button"],
+    "body": ["<button r-click={() => {$1}}>$0</button>"],
+    "description": "HTML button with event handler"
+  },
+  "HTML: input": {
+    "prefix": ["input", "<input"],
+    "body": ["<input type=\"${1:text}\" placeholder=\"${2}\" r-input={(e) => {$3}}$4/>"],
+    "description": "HTML input element"
+  },
+  "HTML: a": {
+    "prefix": ["a", "<a"],
+    "body": ["<a href=\"${1:#}\"$2>$0</a>"],
+    "description": "HTML anchor element"
+  },
+  "HTML: img": {
+    "prefix": ["img", "<img"],
+    "body": ["<img src=\"${1}\" alt=\"${2}\"$3/>"],
+    "description": "HTML image element"
+  },
+  "HTML: ul": {
+    "prefix": ["ul", "<ul"],
+    "body": ["<ul$1>", "  <li>$0</li>", "</ul>"],
+    "description": "HTML unordered list"
+  },
+  "HTML: ol": {
+    "prefix": ["ol", "<ol"],
+    "body": ["<ol$1>", "  <li>$0</li>", "</ol>"],
+    "description": "HTML ordered list"
+  },
+  "HTML: li": {
+    "prefix": ["li", "<li"],
+    "body": ["<li$1>$0</li>"],
+    "description": "HTML list item"
+  },
+  "HTML: form": {
+    "prefix": ["form", "<form"],
+    "body": ["<form r-submit={(e) => {$1}}$2>", "  $0", "</form>"],
+    "description": "HTML form with submit handler"
+  },
+  "HTML: select": {
+    "prefix": ["select", "<select"],
+    "body": [
+      "<select r-change={(e) => {$1}}$2>",
+      "  <option value=\"${3}\">${4}</option>",
+      "  $0",
+      "</select>"
+    ],
+    "description": "HTML select element"
+  },
+  "HTML: textarea": {
+    "prefix": ["textarea", "<textarea"],
+    "body": ["<textarea r-input={(e) => {$1}}$2>$0</textarea>"],
+    "description": "HTML textarea element"
+  },
+  "HTML: label": {
+    "prefix": ["label", "<label"],
+    "body": ["<label htmlFor=\"${1}\"$2>$0</label>"],
+    "description": "HTML label element"
+  },
+  "HTML: table": {
+    "prefix": ["table", "<table"],
+    "body": [
+      "<table$1>",
+      "  <thead>",
+      "    <tr>",
+      "      <th>$2</th>",
+      "    </tr>",
+      "  </thead>",
+      "  <tbody>",
+      "    <tr>",
+      "      <td>$0</td>",
+      "    </tr>",
+      "  </tbody>",
+      "</table>"
+    ],
+    "description": "HTML table structure"
+  },
+  "HTML: section": {
+    "prefix": ["section", "<section"],
+    "body": ["<section$1>", "  $0", "</section>"],
+    "description": "HTML section element"
+  },
+  "HTML: article": {
+    "prefix": ["article", "<article"],
+    "body": ["<article$1>", "  $0", "</article>"],
+    "description": "HTML article element"
+  },
+  "HTML: header": {
+    "prefix": ["header", "<header"],
+    "body": ["<header$1>", "  $0", "</header>"],
+    "description": "HTML header element"
+  },
+  "HTML: footer": {
+    "prefix": ["footer", "<footer"],
+    "body": ["<footer$1>", "  $0", "</footer>"],
+    "description": "HTML footer element"
+  },
+  "HTML: nav": {
+    "prefix": ["nav", "<nav"],
+    "body": ["<nav$1>", "  $0", "</nav>"],
+    "description": "HTML nav element"
+  },
+  "HTML: main": {
+    "prefix": ["main", "<main"],
+    "body": ["<main$1>", "  $0", "</main>"],
+    "description": "HTML main element"
+  },
+  "HTML: aside": {
+    "prefix": ["aside", "<aside"],
+    "body": ["<aside$1>", "  $0", "</aside>"],
+    "description": "HTML aside element"
+  },
+  "Fynix: div with class": {
+    "prefix": "divc",
+    "body": ["<div class=\"${1}\"$2>", "  $0", "</div>"],
+    "description": "Div with class attribute"
+  },
+  "Fynix: div with id": {
+    "prefix": "divi",
+    "body": ["<div id=\"${1}\"$2>", "  $0", "</div>"],
+    "description": "Div with id attribute"
+  }
+}

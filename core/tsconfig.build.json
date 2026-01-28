@@ -1,0 +1,48 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Output directly to dist/ (not dist/types/)
+    "outDir": "./dist",
+    "declarationDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": false,
+    "inlineSources": false,
+    "noEmit": false,
+
+    // Strict production checks
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+
+    "removeComments": true,
+
+    // Ensure Node types are available for plugins
+    "types": ["node", "vite/client"]
+  },
+
+  "include": [
+    "runtime.ts",
+    "context/**/*.ts",
+    "custom/**/*.ts",
+    "error/**/*.ts",
+    "fynix/**/*.ts",
+    "hooks/**/*.ts",
+    "plugins/**/*.ts",
+    "router/**/*.ts",
+    "types/**/*.d.ts"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.stories.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**"
+  ]
+}

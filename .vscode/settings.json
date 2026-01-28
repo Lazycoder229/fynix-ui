@@ -1,0 +1,40 @@
+{
+  // .vscode/settings.json - VS Code workspace settings
+
+  // Associate .fnx files with the Fynix language
+  "files.associations": {
+    "*.fnx": "fynix"
+  },
+
+  // TypeScript settings
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // Enable TypeScript in .fnx files
+  "typescript.validate.enable": true,
+
+  // Editor settings for .fnx files
+  "[fynix]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+
+  // Suggest imports from .fnx files
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+
+  // IntelliSense settings
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+
+  // Enable parameter hints
+  "editor.parameterHints.enabled": true,
+
+  // Enable auto-completion
+  "editor.suggest.showWords": true,
+  "editor.suggest.showSnippets": true
+}

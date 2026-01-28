@@ -1,8 +1,9 @@
 // src/main.js
-import {createFynix} from "fynix-core/fynix";
-import './Global.css'
+import { createFynix } from "@fynixorg/ui";
+import "./Global.css";
 
-const app = createFynix();
-app.mountRouter('#app-root');
-
-
+const router = createFynix();
+// Debug: Log all loaded routes
+console.log("Loaded routes:", router.routes);
+console.log("Dynamic routes:", router.dynamicRoutes);
+router.mountRouter("#app-root");

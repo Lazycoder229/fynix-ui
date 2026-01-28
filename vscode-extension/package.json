@@ -1,0 +1,127 @@
+{
+  "name": "fynix-sfc",
+  "displayName": "Fynix SFC Support",
+  "description": "Syntax highlighting and IntelliSense for Fynix Single File Components (.fnx)",
+  "version": "1.0.0",
+  "publisher": "fynixorg",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "fynix",
+    "fnx",
+    "sfc",
+    "single file component",
+    "typescript",
+    "jsx"
+  ],
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fynixorg/vscode-fynix-sfc"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:fynix",
+    "workspaceContains:**/*.fnx"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "fynix",
+        "aliases": [
+          "Fynix",
+          "fnx"
+        ],
+        "extensions": [
+          ".fnx"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/icon.png",
+          "dark": "./images/icon.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "fynix",
+        "scopeName": "source.fynix",
+        "path": "./syntaxes/fynix.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.typescript": "typescript",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.jsx": "typescriptreact",
+          "meta.embedded.block.css": "css"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "fynix",
+        "path": "./snippets/fynix.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "fynix.createComponent",
+        "title": "Fynix: Create Component"
+      }
+    ],
+    "configuration": {
+      "title": "Fynix SFC",
+      "properties": {
+        "fynix.format.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable formatting for .fnx files"
+        },
+        "fynix.validation.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable validation for .fnx files"
+        },
+        "fynix.autoComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable auto-completion for Fynix functions and attributes"
+        },
+        "fynix.hoverInfo": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show hover information for Fynix elements"
+        }
+      }
+    },
+    "typescriptServerPlugins": [
+      {
+        "name": "typescript-fynix-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "npm run compile:extension && npm run compile:plugin",
+    "compile:extension": "tsc -p ./",
+    "compile:plugin": "tsc typescript-plugin/index.ts --target ES2020 --module commonjs --outDir typescript-plugin",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "postinstall": "cd typescript-plugin && npm install"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^2.19.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.1.0",
+    "vscode-languageserver": "^8.1.0",
+    "typescript-fynix-plugin": "file:./typescript-plugin"
+  }
+}
