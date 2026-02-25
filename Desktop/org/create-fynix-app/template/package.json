@@ -1,0 +1,22 @@
+{
+  "name": "fynix-docss",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+   
+    "vite": "^7.1.11"
+  },
+  "dependencies": {
+    "fynixui": "^1.0.10",
+    "@tailwindcss/vite": "^4.1.18",
+    "fdir": "^5.1.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
+  }
+}
